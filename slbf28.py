@@ -6,38 +6,41 @@
 @Version 1.0
 """
 import os
+import re
 
 import openpyxl
 
 # tablename 字典
-table_name_dict = {1: "gh_fixed_wages",
-                   2: "gh_fixed_welfare",
-                   3: "gh_five_risks",
-                   4: "gh_accumulation_fund",
-                   5: "gh_annuity",
-                   6: "gh_zhe_jiu",
-                   7: "gh_fixed_car_insurance",
-                   8: "gh_fix_cailiao",
-                   9: "gh_traffic_expense",
-                   10: "gh_item_laowu",
-                   11: "gh_item_gongnong",
-                   12: "gh_fixed_water",
-                   13: "gh_repair",
-                   14: "gh_item_waigu",
-                   15: "gh_fixed_taxes",
-                   16: "",
-                   17: "gh_fixed_travel_expense",
-                   18: "gh_fixed_office_allowance",
-                   19: "gh_fixed_print",
-                   20: "gh_computer",
-                   21: "gh_decorate",
-                   22: "gh_fixed_communication_expense",
-                   23: "gh_fixed_training_expense",
-                   24: "gh_fixed_test_fee",
-                   25: "gh_fixed_labour_protection",
-                   26: "gh_fixed_agency_fee",
-                   27: "gh_item_other_expenses",
-                   28: "gh_fix_trade"}
+table_name_dict = {
+    1: "gh_fixed_wages",
+    2: "gh_fixed_welfare",
+    3: "gh_five_risks",
+    4: "gh_accumulation_fund",
+    5: "gh_annuity",
+    6: "gh_zhe_jiu",
+    7: "gh_fixed_car_insurance",
+    8: "gh_fix_cailiao",
+    9: "gh_traffic_expense",
+    10: "gh_item_laowu",
+    11: "gh_item_gongnong",
+    12: "gh_fixed_water",
+    13: "gh_repair",
+    14: "gh_item_waigu",
+    15: "gh_fixed_taxes",
+    16: "",
+    17: "gh_fixed_travel_expense",
+    18: "gh_fixed_office_allowance",
+    19: "gh_fixed_print",
+    20: "gh_computer",
+    21: "gh_decorate",
+    22: "gh_fixed_communication_expense",
+    23: "gh_fixed_training_expense",
+    24: "gh_fixed_test_fee",
+    25: "gh_fixed_labour_protection",
+    26: "gh_fixed_agency_fee",
+    27: "gh_item_other_expenses",
+    28: "gh_fix_trade"
+}
 
 # type_classe_dict 字典
 file_name_dist = {
@@ -78,6 +81,7 @@ folder_path = 'D://Projects//gh//slbfNew//28表更改信息//胜利北方公司�
 # 创建一个新的工作簿用于存储提取的数据
 new_workbook = openpyxl.Workbook()
 new_sheet = new_workbook.active
+# 给汇总表添加表头
 new_sheet.append(["id", "type_classe", "tablename"])
 
 print(os.listdir(folder_path))
@@ -88,18 +92,10 @@ for filename in os.listdir(folder_path):
         source_filepath = os.path.join(folder_path, filename)
 
         # 截取_和.之间的文件名
-        index1 = 0
-        index2 = 0
-        j = 0
-        for i in filename:
-            j += 1
-            if i == "_":
-                index1 = j
-            elif i == ".":
-                index2 = j
-            else:
-                continue
-        type_classe_name = filename[index1: index2 - 1]
+        pattern = r'(?<=_).*?(?=\.)'
+        result = re.search(pattern, filename)
+
+        type_classe_name = result.group()
         # 获取根据文件名获取类型
         type_classe_value = file_name_dist[type_classe_name]
 
@@ -117,13 +113,10 @@ for filename in os.listdir(folder_path):
         for col_index, header in enumerate(header_row):
             if header == "type_classe":
                 type_classe_col = col_index + 1  # 列索引从1开始
-        print(filename)
         # 遍历除第一行外每一行的第一个单元格确定背景填充色
         for i in range(2, max_row):
-            print(i)
             # 获取表格填充色颜色
             color = source_sheet.cell(i, 1).fill.fgColor.rgb
-            print(color)
             # 获取黄色行的id和type_classe
             if color == "FFFFFF00":
                 # id 截取第一个字符之后的字符串
